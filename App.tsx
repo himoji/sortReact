@@ -19,20 +19,20 @@ export default function App() {
   //let boxArray = [5, 1, 2, 3, 4];
 
   async function selectionSort(arr: number[], n: number) {
-    var i: number, j: number, min_i: number;
+    var j: number, min_i: number;
 
     for (let i = 0; i < n; i++) {
       min_i = i;
+      setCLastB(i);
       for (j = i + 1; j < n; j++) {
         if (arr[j] < arr[min_i]) {
           min_i = j;
+          setCMinB(j);
         }
       }
       [arr[min_i], arr[i]] = [arr[i], arr[min_i]];
       setBoxArray(arr);
-      setIter((iterator) => i);
-      setCLastB(i);
-      setCMinB(min_i);
+      setIter(i);
 
       await sleep(delay);
     }
@@ -49,16 +49,14 @@ export default function App() {
   }
 
   function handleClickSort() {
-    console.log("Cl");
     if (!verifySort(boxArray, boxArray.length))
       selectionSort(boxArray, boxArray.length);
   }
 
   function handleClickRandom() {
-    console.log("Clrand");
     let randomArray: number[] = [];
     for (let i = 0; i < size; i++) {
-      const randomNumber = Math.floor(Math.random() * 100) + 1;
+      const randomNumber = Math.floor((Math.random() * size) / 2) + 1;
       randomArray.push(randomNumber);
     }
     setBoxArray(randomArray);
@@ -71,6 +69,12 @@ export default function App() {
   }
 
   function handleChangeDelay(e: any) {
+    e.preventDefault();
+    let iter = e.target.value;
+    setDelay(iter);
+  }
+
+  function handleSortChange(e: any) {
     e.preventDefault();
     let iter = e.target.value;
     setDelay(iter);
@@ -149,7 +153,6 @@ export default function App() {
                 fontSize: "3rem",
                 alignSelf: "center",
                 marginTop: "1rem",
-                marginRight: "1rem",
               }}
             >
               Sort
@@ -165,18 +168,37 @@ export default function App() {
                 fontSize: "3rem",
                 alignSelf: "center",
                 marginTop: "1rem",
+                marginRight: "1rem",
+                marginLeft: "1rem",
               }}
             >
               Random
             </button>
+
+            <select
+              onChange={handleSortChange}
+              style={{
+                width: "25rem",
+                backgroundColor: "#52796f",
+                border: "1rem solid #52796f",
+
+                fontSize: "3rem",
+                alignSelf: "center",
+                marginTop: "1rem",
+              }}
+            >
+              <option value="selectionSort">Selection Sort</option>
+              <option value="selectionSort">Selection Sort</option>
+              <option value="selectionSort">Selection Sort</option>
+            </select>
           </div>
-          <h1>Size:</h1>
+          <h1>Size: {`${size}`}</h1>
           <input
             id="sizeRange"
             type="range"
             onChange={(e) => handleChangeSize(e)}
             style={{
-              width: `28rem`,
+              width: `45rem`,
               backgroundColor: "#52796f",
               border: "1rem solid #52796f",
 
@@ -185,14 +207,14 @@ export default function App() {
               marginTop: "1rem",
             }}
             min={2}
-            max={100}
+            max={500}
           />
           <input
             type="input"
             placeholder="Delay in ms (default: 100)"
             onChange={(e) => handleChangeDelay(e)}
             style={{
-              width: `28rem`,
+              width: `35rem`,
               backgroundColor: "#52796f",
               border: "1rem solid #52796f",
 
