@@ -15,11 +15,12 @@ export default function App() {
   const [delay, setDelay] = useState(100);
   const [currentLastBox, setCLastB] = useState(0);
   const [currentMinBox, setCMinB] = useState(0);
+  const [selectedSort, setSelectedSort] = useState("selectionSort");
 
   //let boxArray = [5, 1, 2, 3, 4];
 
   async function selectionSort(arr: number[], n: number) {
-    var j: number, min_i: number;
+    let j: number, min_i: number;
 
     for (let i = 0; i < n; i++) {
       min_i = i;
@@ -38,6 +39,48 @@ export default function App() {
     }
   }
 
+  async function bubbleSort(arr: number[], n: number) {
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n - i - 1; j++) {
+        setCMinB(j + 1); //yellow
+        setCLastB(j);
+        if (arr[j] > arr[j + 1]) {
+          [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+        }
+
+        setBoxArray(arr);
+      }
+      await sleep(delay);
+
+      setIter(i);
+    }
+  }
+
+  async function quickSort(arr) {
+    if (arr.length <= 1) {
+      return arr;
+    }
+
+    let pivot = arr[0];
+    let leftArr = [];
+    let rightArr = [];
+
+    for (let i = 1; i < arr.length; i++) {
+      if (arr[i] < pivot) {
+        leftArr.push(arr[i]);
+      } else {
+        rightArr.push(arr[i]);
+      }
+      setCLastB(i);
+      setCMinB(pivot);
+      setIter(i);
+      setBoxArray(arr);
+      await sleep(delay);
+    }
+
+    return [...quickSort(leftArr), pivot, ...quickSort(rightArr)];
+  }
+
   function verifySort(arr: number[], n: number) {
     for (let i = 0; i < n; i++) {
       if (arr[i] > arr[i + 1]) {
@@ -48,15 +91,30 @@ export default function App() {
     return true;
   }
 
-  function handleClickSort() {
+  async function handleClickSort() {
     if (!verifySort(boxArray, boxArray.length))
-      selectionSort(boxArray, boxArray.length);
+      switch (selectedSort) {
+        case "selectionSort":
+          selectionSort(boxArray, boxArray.length);
+          break;
+        case "bubbleSort":
+          console.log("BubbleSort call");
+          bubbleSort(boxArray, boxArray.length);
+          break;
+        case "quickSort":
+          console.log("quickSort call");
+          quickSort(boxArray);
+          break;
+        default:
+          break;
+      }
+    selectionSort(boxArray, boxArray.length);
   }
 
   function handleClickRandom() {
     let randomArray: number[] = [];
     for (let i = 0; i < size; i++) {
-      const randomNumber = Math.floor((Math.random() * size) / 2) + 1;
+      const randomNumber = Math.floor(Math.random() * size) + 1;
       randomArray.push(randomNumber);
     }
     setBoxArray(randomArray);
@@ -76,8 +134,8 @@ export default function App() {
 
   function handleSortChange(e: any) {
     e.preventDefault();
-    let iter = e.target.value;
-    setDelay(iter);
+    let sSort = e.target.value;
+    setSelectedSort(sSort);
   }
 
   const Box = ({ value, bgColor }: { value: number; bgColor: string }) => {
@@ -88,6 +146,7 @@ export default function App() {
           backgroundColor: bgColor,
           height: `${value}rem`,
           width: `${56 / nBoxArray}rem`,
+          outline: "black solid 0.01rem",
         }}
       ></div>
     );
@@ -118,7 +177,7 @@ export default function App() {
               margin: "0 0 0 0",
             }}
           >
-            {boxArray.map((value: number, i: any) => {
+            {boxArray.map((value: number, i: number) => {
               switch (i) {
                 case currentMinBox:
                   return (
@@ -188,8 +247,8 @@ export default function App() {
               }}
             >
               <option value="selectionSort">Selection Sort</option>
-              <option value="selectionSort">Selection Sort</option>
-              <option value="selectionSort">Selection Sort</option>
+              <option value="bubbleSort">Bubble Sort</option>
+              <option value="quickSort">Quick Sort</option>
             </select>
           </div>
           <h1>Size: {`${size}`}</h1>
